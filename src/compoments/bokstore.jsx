@@ -4,12 +4,34 @@ import {books} from "./compomentsData.js"
 import { useState } from "react";
 
 
+
+
  function Books() {
-let [isShow, setIsShow] = useState(null)
+let [book, setBook] = useState(null)
 
 
-function hide(){
-  setIsShow(null) 
+function hidePopUp(){
+  setBook(null) 
+}
+
+async function sendRequest(e){
+  e.preventDefault();
+const talab = {name:e.target.name.value , phone:e.target.phone.value, bookname:book,place:e.target.place.value}
+try{
+ const send = await fetch("http://localhost:3000/sendTalab",{
+    method:"POST",
+    body:JSON.stringify(talab),
+    headers:{
+      "Content-Type":"application/json",
+    }
+  })
+  if(send.ok){
+    console.log("nice")
+  }
+}
+catch(err){
+  console.log(err)
+}
 }
   let booksForsale = books.filter(books=>
     books.isBying === true
@@ -34,7 +56,7 @@ function hide(){
        <h2 className="text-base text-[#00E7C8] mb-2.5"> {books.bookName}</h2>
        <h5 className="text-sm text-[#202020] mb-4 font-light"> {books.description}</h5>
        <div className="flex justify-between items-center">
-         <button onClick={()=>{setIsShow(books.bookName)}} className="bg-[rgba(0,172,163,0.12)] text-[#00E7C8] py-2.5 px-5 text-xs rounded-md cursor-pointer transition-all duration-300 hover:bg-[#202020] hover:-translate-y-0.5">
+         <button onClick={()=>{setBook(books.bookName)}} className="bg-[rgba(0,172,163,0.12)] text-[#00E7C8] py-2.5 px-5 text-xs rounded-md cursor-pointer transition-all duration-300 hover:bg-[#202020] hover:-translate-y-0.5">
          شراء
          </button>
        </div>
@@ -61,18 +83,18 @@ function hide(){
      </div>
    </div></div>
   
-   )}{ isShow &&(
+   )}{ book &&(
          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white p-8 rounded-lg shadow-lg w-96">
                 <div className="flex justify-end">
-                  <button onClick={hide}  className="text-gray-1000">
+                  <button onClick={hidePopUp}  className="text-gray-1000">
                     &times;
                   </button>
                 </div>
-                <h2 className="text-xl mb-4 text-center font-semibold">
-               {isShow} 
+                 <h2 className="text-xl mb-4 text-center font-semibold">
+               {book} 
                 </h2>
-                <form>
+                <form onSubmit={sendRequest}>
                   <div className="mb-4">
                     <label className="block text-right text-gray-700">
                       الاسم الكامل:
@@ -80,11 +102,7 @@ function hide(){
                     <input
                       type="text"
                       className="w-full border rounded p-2 focus:outline-none focus:ring"
-                    />
-                      <input
-                      type="text"
-                      className="w-full border rounded p-2 focus:outline-none focus:ring"
-                      value={isShow} hidden
+                      name="name"
                     />
                   </div>
                   <div className="mb-4">
@@ -94,6 +112,7 @@ function hide(){
                     <input
                       type="text"
                       className="w-full border rounded p-2 focus:outline-none focus:ring"
+                      name="phone"
                     />
                   </div>
                   <div className="mb-4">
@@ -103,6 +122,7 @@ function hide(){
                     <input
                       type="text"
                       className="w-full border rounded p-2 focus:outline-none focus:ring"
+                      name="place"
                     />
                   </div>
                   <div className="mb-4">
