@@ -1,13 +1,13 @@
 import Header from "./header"
 import Footer from "./footer.jsx";
-import {books} from "./compomentsData.js"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 
 
  function Books() {
 let [book, setBook] = useState(null)
+let [bookData,setBookdata] = useState([])
 
 
 function hidePopUp(){
@@ -16,7 +16,7 @@ function hidePopUp(){
 
 async function sendRequest(e){
   e.preventDefault();
-const talab = {name:e.target.name.value , phone:e.target.phone.value, bookname:book,place:e.target.place.value}
+const talab = {name:e.target.name.value , phone:e.target.phone.value, bookname:book , note:e.target.note.value}
 try{
  const send = await fetch("http://localhost:3000/sendTalab",{
     method:"POST",
@@ -26,18 +26,36 @@ try{
     }
   })
   if(send.ok){
-    console.log("nice")
+    console.log('sended')
+    setBook(null) 
   }
 }
 catch(err){
   console.log(err)
 }
 }
-  let booksForsale = books.filter(books=>
+
+useEffect( ()=>{
+  async function getBooks(){
+    try{
+   const data = await   fetch('http://localhost:3000/getBookses');
+   const allBooks = await data.json();
+   setBookdata(allBooks)
+    }
+    catch(err){
+      console.log(err)
+    }
+
+  }
+  getBooks()
+},[])
+
+
+  let booksForsale = bookData.filter(books=>
     books.isBying === true
   );
     
-  let booksfree = books.filter(books=> 
+  let booksfree = bookData.filter(books=> 
     books.isBying !==true
   );
       return(
@@ -49,7 +67,7 @@ catch(err){
 </div>
 
      {booksForsale.map(books=>
-<div key={books.bookName} dir="rtl" className="max-w-[800px] w-full p-5 m-[0px] mx-auto box-border">
+<div key={books._id} dir="rtl" className="max-w-[800px] w-full p-5 m-[0px] mx-auto box-border">
    <div className="flex bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-5 overflow-hidden transition-shadow duration-300 hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)]">
      <img src={books.url} alt="صورة الكتاب" className="w-[200px] h-auto sm:h-[160px]" />
      <div className="p-5 flex-grow">
@@ -66,7 +84,7 @@ catch(err){
    )}
     { booksfree.map(books=>
 
-<div key={books.bookName} dir="rtl" className="max-w-[800px] w-full p-5 m-[0px] mx-auto box-border">
+<div key={books._id} dir="rtl" className="max-w-[800px] w-full p-5 m-[0px] mx-auto box-border">
    <div className="flex bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-5 overflow-hidden transition-shadow duration-300 hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)]">
      <img src={books.url} alt="صورة الكتاب" className="w-[200px] h-auto sm:h-[160px]" />
      <div className="p-5 flex-grow">
@@ -97,7 +115,7 @@ catch(err){
                 <form onSubmit={sendRequest}>
                   <div className="mb-4">
                     <label className="block text-right text-gray-700">
-                      الاسم الكامل:
+                    :   الاسم الكامل
                     </label>
                     <input
                       type="text"
@@ -107,7 +125,7 @@ catch(err){
                   </div>
                   <div className="mb-4">
                     <label className="block text-right text-gray-700">
-                      رقم الهاتف:
+                    :     رقم الهاتف
                     </label>
                     <input
                       type="text"
@@ -117,12 +135,12 @@ catch(err){
                   </div>
                   <div className="mb-4">
                     <label className="block text-right text-gray-700">
-                      عنوان التوصيل:
+                    : ملاحظة 
                     </label>
                     <input
                       type="text"
                       className="w-full border rounded p-2 focus:outline-none focus:ring"
-                      name="place"
+                      name="note"
                     />
                   </div>
                   <div className="mb-4">
