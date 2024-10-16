@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import talab from "./talab.js"
 import bookses from "./bookses.js"
 import cors from "cors"
+import videos from "./videos.js"
 
 dotenv.config()
 
@@ -11,9 +12,9 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cors())
-const port = process.env.PORT;
+const port = 3000;
 
-const db = mongoose.connect('mongodb://localhost:27017/Nousra');
+const db = mongoose.connect(process.env.DBURL);
 db.then(()=>{
     console.log('connected to db')
 })
@@ -38,6 +39,16 @@ app.get("/getBookses", async (req,res)=>{
     try{
         const books = await bookses.find({})
      res.status(200).json(books)
+    }
+    catch(err){
+        console.log(err)
+    }
+})
+
+app.get("/getvideos", async (req,res)=>{
+    try{
+        const video = await videos.find({})
+     res.status(200).json(video)
     }
     catch(err){
         console.log(err)
