@@ -22,7 +22,7 @@ async function sendRequest(e){
   e.preventDefault();
 const talab = {name:e.target.name.value , phone:e.target.phone.value, bookname:book , note:e.target.note.value}
 try{
- const send = await fetch("/api/sendTalab",{
+ const send = await fetch("/sendTalab",{
     method:"POST",
     body:JSON.stringify(talab),
     headers:{
@@ -46,7 +46,7 @@ catch(err){
 useEffect( ()=>{
   async function getBooks(){
     try{
-   const data = await   fetch('/api/getBookses');
+   const data = await   fetch('/getBookses');
    const allBooks = await data.json();
    setBookdata(allBooks)
    setTimeout(() => {
