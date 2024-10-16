@@ -7,7 +7,7 @@ const [videos,setVideos]= useState([]);
 useEffect(()=>{
     async function getBooks(){
   try{
-    const data = await fetch('/api/getvideos');
+    const data = await fetch('/getvideos');
     const allVideos = await data.json()
     setVideos(allVideos)
     console.log()
