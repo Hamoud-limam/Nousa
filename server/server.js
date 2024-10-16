@@ -4,16 +4,26 @@ import mongoose from "mongoose";
 import talab from "./talab.js"
 import bookses from "./bookses.js"
 import cors from "cors"
+import { fileURLToPath } from 'url';
+import path from 'node:path';
+
 import videos from "./videos.js"
 
 dotenv.config()
 
 const app = express()
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static("dist"))
+app.use('/images', express.static('images'))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cors())
 const port = 3000;
-
+ 
 const db = mongoose.connect(process.env.DBURL);
 db.then(()=>{
     console.log('connected to db')
@@ -53,6 +63,9 @@ app.get("/getvideos", async (req,res)=>{
     catch(err){
         console.log(err)
     }
+})
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'dist/index.html'))
 })
 
 app.listen(port,()=>{
