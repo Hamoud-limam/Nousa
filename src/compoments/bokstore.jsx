@@ -1,5 +1,7 @@
 import Header from "./header"
 import Footer from "./footer.jsx";
+import Sended from "./sended.jsx"
+import BookSkeleton from "./skeletons/bookskeleton.jsx"
 import { useState, useEffect } from "react";
 
 
@@ -8,17 +10,19 @@ import { useState, useEffect } from "react";
  function Books() {
 let [book, setBook] = useState(null)
 let [bookData,setBookdata] = useState([])
+const [loading,setLoading] = useState(true)
+const [sended,setSended] = useState(false)
 
 
 function hidePopUp(){
   setBook(null) 
-}
+} 
 
 async function sendRequest(e){
   e.preventDefault();
 const talab = {name:e.target.name.value , phone:e.target.phone.value, bookname:book , note:e.target.note.value}
 try{
- const send = await fetch("http://localhost:3000/sendTalab",{
+ const send = await fetch("/api/sendTalab",{
     method:"POST",
     body:JSON.stringify(talab),
     headers:{
@@ -27,6 +31,10 @@ try{
   })
   if(send.ok){
     console.log('sended')
+    setSended(true)
+    setTimeout(()=>{
+    setSended(false)
+    },2000)
     setBook(null) 
   }
 }
@@ -38,9 +46,14 @@ catch(err){
 useEffect( ()=>{
   async function getBooks(){
     try{
-   const data = await   fetch('http://localhost:3000/getBookses');
+   const data = await   fetch('/api/getBookses');
    const allBooks = await data.json();
    setBookdata(allBooks)
+   setTimeout(() => {
+    
+   setBookdata(allBooks)
+   setLoading(false)
+   }, 2000)
     }
     catch(err){
       console.log(err)
@@ -60,49 +73,58 @@ useEffect( ()=>{
   );
       return(
       <>  
+      
 <div className="flex justify-center items-center mt-8">
   <h1 dir="rtl" className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl text-center mx-4">
     <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">مرحبا بكم في</span> متجر الكتب
   </h1>
-</div>
+</div>{loading ? (
+  <BookSkeleton />
+) : (
+  <>
+    {booksForsale.map(books => (
+      <div key={books._id} dir="rtl" className="max-w-[800px] w-full p-5 m-[0px] mx-auto box-border">
+        <div className="flex bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-5 overflow-hidden transition-shadow duration-300 hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)]">
+          <img src={books.url} alt="صورة الكتاب" className="w-[200px] h-auto sm:h-[160px]" />
+          <div className="p-5 flex-grow">
+            <h2 className="text-base text-[#00E7C8] mb-2.5">{books.bookName}</h2>
+            <h5 className="text-sm text-[#202020] mb-4 font-light">{books.description}</h5>
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => { setBook(books.bookName); }}
+                className="bg-[rgba(0,172,163,0.12)] text-[#00E7C8] py-2.5 px-5 text-xs rounded-md cursor-pointer transition-all duration-300 hover:bg-[#202020] hover:-translate-y-0.5"
+              >
+                شراء
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+    
+    {booksfree.map(books => (
+      <div key={books._id} dir="rtl" className="max-w-[800px] w-full p-5 m-[0px] mx-auto box-border">
+        <div className="flex bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-5 overflow-hidden transition-shadow duration-300 hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)]">
+          <img src={books.url} alt="صورة الكتاب" className="w-[200px] h-auto sm:h-[160px]" />
+          <div className="p-5 flex-grow">
+            <h2 className="text-base text-[#00E7C8] mb-2.5">{books.bookName}</h2>
+            <h5 className="text-sm text-[#202020] mb-4 font-light">{books.description}</h5>
+            <div className="flex justify-between items-center">
+              <a href={books.downloadUrl} className="inline-block" download>
+                <button className="bg-[rgba(0,172,163,0.12)] text-[#00E7C8] py-2.5 px-5 text-xs rounded-md cursor-pointer transition-all duration-300 hover:bg-[#202020] hover:-translate-y-0.5">
+                  تحميل
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </>
+)}
 
-     {booksForsale.map(books=>
-<div key={books._id} dir="rtl" className="max-w-[800px] w-full p-5 m-[0px] mx-auto box-border">
-   <div className="flex bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-5 overflow-hidden transition-shadow duration-300 hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)]">
-     <img src={books.url} alt="صورة الكتاب" className="w-[200px] h-auto sm:h-[160px]" />
-     <div className="p-5 flex-grow">
-       <h2 className="text-base text-[#00E7C8] mb-2.5"> {books.bookName}</h2>
-       <h5 className="text-sm text-[#202020] mb-4 font-light"> {books.description}</h5>
-       <div className="flex justify-between items-center">
-         <button onClick={()=>{setBook(books.bookName)}} className="bg-[rgba(0,172,163,0.12)] text-[#00E7C8] py-2.5 px-5 text-xs rounded-md cursor-pointer transition-all duration-300 hover:bg-[#202020] hover:-translate-y-0.5">
-         شراء
-         </button>
-       </div>
-     </div>
-   </div></div>
-
-   )}
-    { booksfree.map(books=>
-
-<div key={books._id} dir="rtl" className="max-w-[800px] w-full p-5 m-[0px] mx-auto box-border">
-   <div className="flex bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.1)] mb-5 overflow-hidden transition-shadow duration-300 hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)]">
-     <img src={books.url} alt="صورة الكتاب" className="w-[200px] h-auto sm:h-[160px]" />
-     <div className="p-5 flex-grow">
-       <h2 className="text-base text-[#00E7C8] mb-2.5"> {books.bookName}</h2>
-       <h5 className="text-sm text-[#202020] mb-4 font-light"> {books.description}</h5>
-       <div className="flex justify-between items-center" >
-       <a  href={books.downloadUrl} className="inline-block" download >
-  <button className="bg-[rgba(0,172,163,0.12)] text-[#00E7C8] py-2.5 px-5 text-xs rounded-md cursor-pointer transition-all duration-300 hover:bg-[#202020] hover:-translate-y-0.5">
-  تحميل
-  </button>
-</a>
-
-       </div>
-     </div>
-   </div></div>
-  
-   )}{ book &&(
-         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+{ book &&(
+         <div className="fixed inset-0 flex items-center justify-center bg-black  bg-opacity-50">
               <div className="bg-white p-8 rounded-lg shadow-lg w-96">
                 <div className="flex justify-end">
                   <button onClick={hidePopUp}  className="text-gray-1000">
@@ -159,6 +181,7 @@ useEffect( ()=>{
               </div>
             </div>)
  }
+ {sended &&(<Sended/>)}
         
    </>
       )
