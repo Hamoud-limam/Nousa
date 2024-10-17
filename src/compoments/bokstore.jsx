@@ -49,11 +49,7 @@ useEffect( ()=>{
    const data = await   fetch('/getBookses');
    const allBooks = await data.json();
    setBookdata(allBooks)
-   setTimeout(() => {
-    
-   setBookdata(allBooks)
    setLoading(false)
-   }, 2000)
     }
     catch(err){
       console.log(err)
